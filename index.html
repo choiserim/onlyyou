@@ -61,7 +61,6 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            /* 여백을 미세하게 조정하여 하단 잘림 방지 */
             padding: 50px 50px 40px 50px; 
         }
 
@@ -175,7 +174,7 @@
                             "고객님의 데이터가 곧 가장 완벽한 보험의 기준입니다."
                         </p>
 
-                        <!-- Compliance Section (잘림 방지를 위해 간격 최적화) -->
+                        <!-- Compliance Section -->
                         <div class="text-left p-4 bg-white/95 border border-slate-200 text-[10.8px] text-slate-600 leading-[1.6] rounded-xl shadow-sm">
                             <p class="font-black mb-1.5 text-samsung-blue underline text-[11.5px]">[법적 고지: 개인정보 보호 및 데이터 이용 안내]</p>
                             <p class="mb-1.5 font-bold">본 서비스는 삼성생명의 전문적인 리스크 분석 서비스로, 「개인정보 보호법」 및 「신용정보의 이용 및 보호에 관한 법률」에 따라 운영됩니다. 맞춤형 보험 설계를 위해서는 고객님의 명확한 정보 제공 동의 및 본인 인증이 반드시 필요합니다.</p>
@@ -214,29 +213,29 @@
         }
 
         async function generateCanvas(area) {
-            // 캡처 시 브라우저 스케일 영향 제거
+            // 캡처 시 브라우저 스케일 영향 완벽 제거
             const originalTransform = area.style.transform;
             area.style.transform = 'none';
             
-            // 캡처 전 페이지 상단으로 강제 이동 (스크롤 오프셋 오류 방지)
+            // 캡처 전 페이지 상단으로 강제 이동
             window.scrollTo(0, 0);
 
+            // html2canvas 옵션 보강 (windowWidth 고정으로 좁게 나오는 문제 해결)
             const canvas = await html2canvas(area, {
-                scale: 3, // 인쇄 품질을 위해 해상도 3배 증가
+                scale: 3, 
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 width: 794,
                 height: 1123,
+                windowWidth: 794, // 캡처 시 가상 윈도우 너비를 A4 너비로 고정
+                windowHeight: 1123,
                 logging: false,
                 x: 0,
                 y: 0,
                 scrollX: 0,
-                scrollY: 0,
-                windowWidth: document.documentElement.offsetWidth,
-                windowHeight: document.documentElement.offsetHeight
+                scrollY: 0
             });
 
-            // 원래 화면 스케일 복구
             area.style.transform = originalTransform;
             return canvas;
         }
@@ -262,10 +261,9 @@
             const area = document.getElementById('capture-area');
             try {
                 const canvas = await generateCanvas(area);
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
                 const { jsPDF } = window.jspdf;
                 
-                // A4 크기(210mm x 297mm)로 PDF 생성
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
                 pdf.save('삼성생명_전단지_시안.pdf');
