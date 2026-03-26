@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>삼성생명 - 맞춤형 전단지 최종본</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas & jspdf for saving features -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Samsung Blue Color Scheme */
+        .text-samsung-blue { color: #0047a0; }
+        .bg-samsung-blue { background-color: #0047a0; }
+        .border-samsung-blue { border-color: #0047a0; }
+
+        /* A4 Portrait Ratio (210mm : 297mm) */
+        #capture-area {
+            background-color: #ffffff;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .qr-upload-label {
+            cursor: pointer;
+            display: block;
+            position: relative;
+        }
+        .qr-upload-label::after {
+            content: '클릭하여 QR 교체';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 12px;
+        }
+        .qr-upload-label:hover::after {
+            opacity: 1;
+        }
+
+        .tool-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            z-index: 100;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-wrapper {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            /* 여백을 조금 더 줄여 하단 테두리가 잘리지 않게 조정 */
+            padding: 18mm 15mm 15mm 15mm; 
+        }
+
+        @media (max-width: 215mm) {
+            #capture-area {
+                width: 95vw;
+                height: 134.3vw;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Top Toolbar -->
+    <div class="tool-bar shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="font-black text-samsung-blue text-xl">Samsung Life Flyer</div>
+            <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500 font-bold tracking-tight">레이아웃 최종 최적화</span>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="saveAsImage()" class="flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded text-sm font-bold hover:bg-slate-50 transition-colors">
+                이미지 저장
+            </button>
+            <button onclick="saveAsPDF()" class="flex items-center gap-2 bg-samsung-blue text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-800 transition-colors">
+                PDF 저장 (A4)
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Flyer Area -->
+    <div id="capture-area" class="mb-20">
+        <div class="content-wrapper">
+            <!-- 1. Headline Section -->
+            <header class="text-center mb-5">
+                <p class="text-xs font-bold text-samsung-blue mb-3 tracking-[0.3em] uppercase">Samsung Life Insurance</p>
+                <h1 class="text-[36px] font-black leading-tight mb-6">
+                    좋은 보험은 많습니다.<br>
+                    그러나 <span class="text-samsung-blue">당신에게 맞는 보험</span>은<br>
+                    단 한 가지입니다.
+                </h1>
+                <div class="text-[17px] text-slate-600 max-w-2xl mx-auto leading-[1.5] font-medium">
+                    <p class="mb-1">수천 가지 상품, 수만 명의 설계사.</p>
+                    <p class="mb-1 text-slate-800 font-bold">그들이 말하는 '좋은 보험'은 철저히 <span class="text-samsung-blue underline decoration-2 underline-offset-4">그들에게 좋은 보험</span>일 뿐입니다.</p>
+                    <p class="mb-1">남의 옷을 입고 살 순 없지 않습니까?</p>
+                    <p class="font-bold text-slate-900 text-[22px] mt-3">우리는 당신의 불안이 아닌 미래의 삶을 읽습니다.</p>
+                </div>
+            </header>
+
+            <!-- 2. Action & Legal Section (테두리가 보이도록 padding 및 margin 조정) -->
+            <section class="text-center flex-grow flex flex-col justify-center">
+                <div class="bg-blue-50/40 rounded-[24px] p-6 border border-blue-200 shadow-sm">
+                    <h2 class="text-[20px] font-black mb-2">지금 등록하고 정밀 진단을 받으세요</h2>
+                    <p class="text-[14px] text-slate-600 mb-4 max-w-xl mx-auto leading-relaxed">
+                        아래 QR 코드를 스캔하여 <strong>정보제공동의 및 고객 등록</strong>을 완료해 주십시오.<br>
+                        삼성생명의 전문 컨설턴트가 당신의 데이터를 분석하여 최적의 제안을 드립니다.
+                    </p>
+
+                    <!-- QR Area (Centered) -->
+                    <div class="flex justify-center mb-4">
+                        <div class="inline-block p-4 bg-white border-2 border-samsung-blue rounded-[20px] shadow-sm">
+                            <label class="qr-upload-label">
+                                <input type="file" accept="image/*" class="hidden" onchange="previewQR(this)">
+                                <img id="qr-display" src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="QR" class="w-32 h-32 object-contain mx-auto">
+                            </label>
+                            <p class="mt-3 text-[10px] text-samsung-blue font-black tracking-[0.25em] uppercase leading-none text-center">
+                                SCAN FOR CONSULTATION
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="font-bold text-[18px] text-slate-800 mb-4 italic tracking-tight">
+                        "고객님의 데이터가 곧 가장 완벽한 보험의 기준입니다."
+                    </p>
+
+                    <!-- Compliance Section (테두리 안쪽 여백 조정) -->
+                    <div class="text-left p-4 bg-white/95 border border-slate-200 text-[10.5px] text-slate-600 leading-[1.5] rounded-xl shadow-sm">
+                        <p class="font-black mb-1.5 text-samsung-blue underline text-[11.5px]">[법적 고지: 개인정보 보호 및 데이터 이용 안내]</p>
+                        <p class="mb-1.5 font-bold">본 서비스는 삼성생명의 전문적인 리스크 분석 서비스로, 「개인정보 보호법」 및 「신용정보의 이용 및 보호에 관한 법률」에 따라 운영됩니다. 맞춤형 보험 설계를 위해서는 고객님의 명확한 정보 제공 동의 및 본인 인증이 반드시 필요합니다.</p>
+                        <ul class="space-y-0.5 font-medium">
+                            <li><span class="font-bold text-slate-800">· 수집 및 이용 목적:</span> 라이프사이클 분석, 맞춤형 보험 상품 비교 및 설계 상담</li>
+                            <li><span class="font-bold text-slate-800">· 보유 및 이용기간:</span> 목적 달성 시 또는 고객 요청 시 즉시 파기</li>
+                            <li><span class="font-bold text-slate-800">·</span> QR 스캔 후 진행되는 동의 절차는 암호화된 보안 서버를 통해 안전하게 보호됩니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Instructions Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-xl text-sm shadow-2xl transition-opacity duration-500 z-[200]">
+        QR 코드를 클릭하여 교체한 뒤 저장하세요.
+    </div>
+
+    <script>
+        function previewQR(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('qr-display').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function saveAsImage() {
+            const toast = document.getElementById('toast');
+            toast.innerText = "이미지를 생성 중입니다...";
+            const area = document.getElementById('capture-area');
+            
+            try {
+                const canvas = await html2canvas(area, {
+                    scale: 3, 
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    width: area.offsetWidth,
+                    height: area.offsetHeight,
+                    logging: false
+                });
+                const link = document.createElement('a');
+                link.download = '삼성생명_전단지_시안_최종.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                toast.innerText = "이미지가 저장되었습니다.";
+            } catch (err) {
+                console.error(err);
+                alert("이미지 저장 중 오류가 발생했습니다.");
+            } finally {
+                setTimeout(() => toast.innerText = "QR 코드를 클릭하여 교체한 뒤 저장하세요.", 3000);
+            }
+        }
+
+        async function saveAsPDF() {
+            const toast = document.getElementById('toast');
+            toast.innerText = "PDF를 생성 중입니다...";
+            const area = document.getElementById('capture-area');
+
+            try {
+                const canvas = await html2canvas(area, {
+                    scale: 3, 
+                    useCORS: true,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const { jsPDF } = window.jspdf;
+                
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('삼성생명_전단지_시안_최종.pdf');
+                
+                toast.innerText = "PDF가 저장되었습니다.";
+            } catch (err) {
+                console.error(err);
+                alert("PDF 저장 중 오류가 발생했습니다.");
+            } finally {
+                setTimeout(() => toast.innerText = "QR 코드를 클릭하여 교체한 뒤 저장하세요.", 3000);
+            }
+        }
+    </script>
+</body>
+</html>
