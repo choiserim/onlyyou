@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMSUNG LIFE - Professional Risk Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap');
+        
+        :root {
+            --samsung-blue: #007aff;
+            --deep-slate: #0f172a;
+        }
+
+        body { 
+            font-family: 'Noto Sans KR', sans-serif; 
+            background-color: #f8fafc; 
+            color: #1e293b;
+            letter-spacing: -0.03em;
+        }
+
+        /* A4 규격 엄격 적용 (595px x 842px) */
+        .a4-container {
+            width: 595px; 
+            height: 842px; 
+            margin: auto; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            background-color: #ffffff;
+            color: #000;
+            box-sizing: border-box;
+            overflow: hidden;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
+        }
+
+        .visual-frame { 
+            height: 35%; 
+            width: 100%; 
+            position: relative; 
+            overflow: hidden;
+        }
+
+        .visual-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        .content-frame { 
+            height: 65%; 
+            padding: 2.5rem 3rem; 
+            display: flex; 
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .headline-text {
+            font-weight: 900;
+            font-size: 2.25rem;
+            line-height: 1.15;
+            letter-spacing: -0.05em;
+            color: var(--deep-slate);
+        }
+
+        .sub-text {
+            font-weight: 400;
+            font-size: 1rem;
+            line-height: 1.65;
+            margin-top: 1.2rem;
+            color: #475569;
+            word-break: keep-all;
+        }
+
+        .nav-btn { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #94a3b8;
+            font-weight: 500;
+            border-left: 2px solid #e2e8f0;
+        }
+        .nav-btn.active { 
+            color: var(--samsung-blue); 
+            font-weight: 800; 
+            border-left: 4px solid var(--samsung-blue); 
+            background-color: #eff6ff;
+            padding-left: 1.25rem; 
+        }
+
+        .feature-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid #f1f5f9;
+            height: 100%;
+        }
+
+        .contact-footer {
+            margin-top: auto; 
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gfc-name {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--deep-slate);
+        }
+
+        .gfc-phone {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--samsung-blue);
+            margin-top: -2px;
+        }
+
+        .btn-save {
+            width: 595px;
+            margin-top: 2rem;
+            padding: 1.2rem;
+            background-color: var(--deep-slate);
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+        }
+        .btn-save:hover {
+            background-color: var(--samsung-blue);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="p-8 flex justify-center">
+
+    <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- 대시보드 컨트롤러 -->
+        <div class="lg:col-span-4 space-y-8">
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" class="h-5 mb-6" alt="samsung">
+                <h1 class="text-2xl font-black tracking-tight text-slate-900 leading-tight">Lifecycle Risk Design<br>Control Center</h1>
+                <p class="text-slate-500 text-sm mt-3 leading-relaxed font-medium">데이터 기반 세대별 맞춤형 리스크 진단 및 보장 설계</p>
+            </div>
+
+            <nav class="flex flex-col space-y-1">
+                <button onclick="changeAge('20s')" id="btn-20s" class="nav-btn text-left text-base py-3 pl-5">20s : 자산 형성 및 커리어 시작기</button>
+                <button onclick="changeAge('30s')" id="btn-30s" class="nav-btn text-left text-base py-3 pl-5">30s : 가족 형성 및 책임 가계기</button>
+                <button onclick="changeAge('40s')" id="btn-40s" class="nav-btn text-left text-base py-3 pl-5">40s : 소득 정점 및 자산 확장기</button>
+                <button onclick="changeAge('50s')" id="btn-50s" class="nav-btn text-left text-base py-3 pl-5">50s : 노후 전환 및 건강 관리기</button>
+                <button onclick="changeAge('60s')" id="btn-60s" class="nav-btn text-left text-base py-3 pl-5">60s : 액티브 시니어, 제2의 도약기</button>
+            </nav>
+
+            <div class="bg-blue-600 p-6 rounded-2xl shadow-lg shadow-blue-200">
+                <h3 class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-2">Technical Insight</h3>
+                <p id="insight-text" class="text-sm text-white leading-relaxed font-medium"></p>
+            </div>
+        </div>
+
+        <!-- 전단지 미리보기 -->
+        <div class="lg:col-span-8 flex flex-col items-center">
+            <div id="flyer" class="a4-container">
+                <div class="visual-frame">
+                    <div id="visual-img" class="w-full h-full bg-cover bg-center"></div>
+                    <div class="visual-overlay"></div>
+                    <div class="absolute bottom-6 left-8">
+                        <span id="flyer-tag" class="text-[10px] font-black text-white bg-blue-600 px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg"></span>
+                    </div>
+                </div>
+
+                <div class="content-frame">
+                    <div class="mb-8">
+                        <h2 id="flyer-headline" class="headline-text"></h2>
+                        <p id="flyer-sub" class="sub-text"></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-5 mb-8">
+                        <div class="feature-box">
+                            <h4 class="text-[11px] font-black text-blue-600 mb-4 uppercase tracking-wider flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
+                                필수 보장 항목
+                            </h4>
+                            <div id="feat-list-1" class="space-y-3.5"></div>
+                        </div>
+                        <div class="feature-box">
+                            <h4 class="text-[11px] font-black text-slate-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span>
+                                핵심 설계 우위
+                            </h4>
+                            <div id="feat-list-2" class="space-y-3.5"></div>
+                        </div>
+                    </div>
+
+                    <div class="contact-footer">
+                        <div class="flex items-center gap-5">
+                            <div class="w-20 h-20 bg-white border border-slate-100 rounded-xl flex flex-col items-center justify-center p-1 shadow-sm overflow-hidden">
+                                <img id="qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fmws.samsunglife.com%3A8440%2F%23%2Fmain%2Fbc%2FTSSBC500M%3Fmdigitkey%3D0002221232" 
+                                     alt="Scan to Samsung Life MWS" class="w-full h-full object-contain">
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-blue-600 font-black tracking-widest uppercase mb-1">개인 자산 컨설팅 전문가</p>
+                                <div class="flex items-baseline gap-2">
+                                    <h3 class="gfc-name">최세림</h3>
+                                    <span class="text-[10px] font-black text-slate-400 uppercase">플래너</span>
+                                </div>
+                                <p class="gfc-phone">010-7526-1826</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-slate-900 tracking-widest mb-1 uppercase">Professional Consultant</p>
+                            <p class="text-[11px] text-slate-400 font-medium leading-relaxed">
+                                풍부한 경험과 전문 데이터로<br>당신의 미래를 설계합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="saveAsPDF()" class="btn-save shadow-xl shadow-slate-200">
+                인쇄용 고화질 PDF 저장
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const flyerData = {
+            "20s": {
+                tag: "Phase 1: Early Asset",
+                headline: "자산 형성기 리스크,<br>비용은 낮추고 기간은 선점",
+                sub: "20대는 사고 시 경제적 복구가 가장 힘든 시기입니다. 낮은 납입료로 100세까지의 핵심 보장을 선점하여 미래 리스크 비용을 고정하는 것이 현명한 자산 설계의 시작입니다.",
+                img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200", 
+                feats1: ["3대 질병(암·뇌·심) 진단비 확보", "활동기 재해 및 수술비 보장"],
+                feats2: ["당사 최다 특약 선택 권한", "중입자 방사선 치료 특약 부가"],
+                insight: "20대 보장 자산은 '시간'을 사는 투자입니다. 가장 건강할 때 가장 넓은 보장을 최저가로 확보하십시오."
+            },
+            "30s": {
+                tag: "Phase 2: Family Responsibility",
+                headline: "책임 가계 형성기,<br>가족의 내일을 지키는 성벽",
+                sub: "30대의 건강은 가계 경제의 기둥입니다. 예기치 못한 질병으로 인한 소득 부재 리스크를 차단하고, 자녀의 성장과 가족의 일상을 지탱할 견고한 보장벽이 필요합니다.",
+                img: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&q=80&w=1200", 
+                feats1: ["가족 결합 특약으로 보험료 할인", "장기 입원/생활비 손실 보전"],
+                feats2: ["표준체 대상 우량체 할인 적용", "유연한 납입 기간 맞춤 설계"],
+                insight: "30대에게 보험은 지출이 아닌 '부채 리스크 상쇄 시스템'입니다. 평온한 가정을 위한 필수 보험입니다."
+            },
+            "40s": {
+                tag: "Phase 3: Peak Performance",
+                headline: "소득 정점기 리스크,<br>핵심 엔진의 정밀 유지보수",
+                sub: "40대는 중증 질환 발병률이 급격히 오르는 구간입니다. 집안의 가장 큰 엔진인 당신의 부재는 모든 시스템의 셧다운을 의미합니다. 고액 치료비와 생활 보전을 동시 설계하십시오.",
+                img: "https://images.unsplash.com/photo-1491336477066-31156b5e4f35?auto=format&fit=crop&q=80&w=1200", 
+                feats1: ["중증 질환 및 고액 진단비 확보", "장기 입원/생활비 손실 보전"],
+                feats2: ["유연한 납입 기간 맞춤 설계", "무료 세무 컨설팅 서비스 지원"],
+                insight: "40대의 암 보장은 단순 치료비가 아닌 '빠른 사회 복귀와 가정 보존'을 돕는 솔루션이어야 합니다."
+            },
+            "50s": {
+                tag: "Phase 4: Golden Transition",
+                headline: "노후 전환 및 건강 관리기,<br>나를 위한 건강한 투자",
+                sub: "50대는 노후를 목전에 둔 건강의 골든타임입니다. 철저한 예방과 집중 관리를 통해 삶의 질을 높이고, 간병 및 만성질환 리스크로부터 나와 가족의 독립적인 일상을 지키십시오.",
+                img: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=1200", 
+                feats1: ["만성 질환 집중 케어 및 건강 관리", "유병자 대상 3대 간편 고지"],
+                feats2: ["최첨단 수술 및 재활 보장 부가", "헬스케어 프리미엄 서비스 연계"],
+                insight: "자녀에게 줄 수 있는 최고의 유산은 재산 이전에 '건강하고 독립적인 부모의 모습'입니다."
+            },
+            "60s": {
+                tag: "Phase 5: The New Beginning",
+                headline: "100세 시대의 60대,<br>인생의 진짜 시작은 지금부터",
+                sub: "60대는 인생의 경험과 여유가 결합된 '액티브 라이프'의 새로운 출발점입니다. 거침없는 도전과 취미 생활을 지켜줄 든든한 보장 위에서, 당신이 꿈꾸던 두 번째 인생의 막을 올리십시오.",
+                img: "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?auto=format&fit=crop&q=80&w=1200", 
+                feats1: ["시니어 맞춤 재해·골절 보장", "만성 질환 집중 케어 및 건강 관리"],
+                feats2: ["헬스케어 프리미엄 서비스 연계", "연금 전환 및 상속 재원 마련"],
+                insight: "100세 시대의 보험은 '아플 때'를 위한 대비를 넘어, '아무 걱정 없이 즐기기 위한' 자유 이용권입니다."
+            }
+        };
+
+        let currentAge = '20s';
+
+        function changeAge(age) {
+            currentAge = age;
+            const item = flyerData[age];
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + age);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const flyer = document.getElementById('flyer');
+            flyer.style.opacity = 0.5;
+            
+            setTimeout(() => {
+                document.getElementById('visual-img').style.backgroundImage = `url('${item.img}')`;
+                document.getElementById('flyer-tag').innerText = item.tag;
+                document.getElementById('flyer-headline').innerHTML = item.headline;
+                document.getElementById('flyer-sub').innerText = item.sub;
+                document.getElementById('insight-text').innerText = item.insight;
+
+                updateList('feat-list-1', item.feats1);
+                updateList('feat-list-2', item.feats2);
+                flyer.style.opacity = 1;
+            }, 100);
+        }
+
+        function updateList(id, items) {
+            const container = document.getElementById(id);
+            if (!container) return;
+            container.innerHTML = items.map(text => `
+                <div class="flex items-start gap-3">
+                    <svg class="mt-1 shrink-0" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="text-[13px] font-bold text-slate-700 leading-tight">${text}</span>
+                </div>
+            `).join('');
+        }
+
+        async function saveAsPDF() {
+            const flyer = document.getElementById('flyer');
+            const button = event.currentTarget;
+            button.innerText = "처리 중...";
+            button.disabled = true;
+
+            try {
+                const canvas = await html2canvas(flyer, { 
+                    scale: 3, 
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: "#ffffff"
+                });
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+                pdf.save(`SamsungLife_RiskReport_${currentAge}_최세림GFC.pdf`);
+            } catch (err) {
+                console.error("PDF 생성 실패:", err);
+            } finally {
+                button.innerText = "인쇄용 고화질 PDF 저장";
+                button.disabled = false;
+            }
+        }
+
+        window.onload = () => { 
+            changeAge('20s'); 
+        };
+    </script>
+</body>
+</html>
